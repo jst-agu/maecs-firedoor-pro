@@ -89,11 +89,11 @@ export default function SiteDetails() {
 
         {/* Engineer & Certification */}
         <div className="flex flex-col gap-1">
-          <label className="text-xs font-bold uppercase text-gray-500">Engineer Initials</label>
+          <label className="text-xs font-bold uppercase text-gray-500">Engineer Name</label>
           <input
             name="engineerInitials"
             type="text"
-            maxLength={3}
+            // maxLength={3}
             className="p-2.5 border border-gray-200 text-gray-600 rounded-lg outline-none font-bold uppercase text-center w-24"
             value={siteDetails.engineerInitials}
             onChange={handleChange}
