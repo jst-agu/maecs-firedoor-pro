@@ -22,7 +22,7 @@ export interface Door {
 }
 
 // 2. Site Details Interface
-interface SiteDetails {
+export interface SiteDetails {
   businessName: string;
   customerName: string;
   siteAddress: string;

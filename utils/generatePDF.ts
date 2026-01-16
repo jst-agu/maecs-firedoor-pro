@@ -4,7 +4,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { OWNER_SIGNATURE, LOGO_BRITISH_SAFETY, LOGO_IFSM, LOGO_MAECS_PAT } from '@/constants/assets';
 import { FIRE_DOOR_QUESTIONS } from '@/constants/questions';
-import { Door } from '@/store/useAssessmentStore';
+import { Door, SiteDetails } from '@/store/useAssessmentStore';
 
 interface jsPDFWithPlugin extends jsPDF {
   lastAutoTable: {
@@ -12,15 +12,17 @@ interface jsPDFWithPlugin extends jsPDF {
   };
 }
 
-// @ts-ignore
-export const generatePDF = (siteDetails: any, doors: Door[]) => {
+
+// export const generatePDF = (siteDetails: any, doors: Door[]) => {
+export const generatePDF = (siteDetails: SiteDetails, doors: Door[]) => {
   const doc = new jsPDF() as jsPDFWithPlugin;
   const timestamp = new Date().toLocaleDateString('en-GB');
   const remedialRequired = doors.some(door => Object.values(door.responses).includes('Fail'));
 
-  const addFooter = (pdf: jsPDF) => {
-    // @ts-ignore
-    const pageCount = (pdf as any).internal.getNumberOfPages();
+  const addFooter = (pdf: jsPDFWithPlugin) => {
+  
+    // const pageCount = (pdf as any).internal.getNumberOfPages();
+    const pageCount = pdf.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       pdf.setPage(i);
       pdf.setFontSize(9);
@@ -124,7 +126,7 @@ export const generatePDF = (siteDetails: any, doors: Door[]) => {
       }
     });
 
-    // @ts-ignore
+  
     let currentY = doc.lastAutoTable.finalY;
 
     if (currentY > 240) {
