@@ -1,11 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-
 const generateCertNumber = () => {
   const date = new Date();
-  const dateStr = date.toISOString().split('T')[0].replace(/-/g, ''); // 20240522
-  const randomStr = Math.random().toString(36).substring(2, 5).toUpperCase(); // 3 random chars
+  const dateStr = date.toISOString().split('T')[0].replace(/-/g, '');
+  const randomStr = Math.random().toString(36).substring(2, 5).toUpperCase();
   return `MAE-${dateStr}-${randomStr}`;
 };
 
@@ -39,13 +38,15 @@ export interface SiteDetails {
 interface AssessmentStore {
   siteDetails: SiteDetails;
   doors: Door[];
-  isSidebarCollapsed: boolean; // Add this
+  isSidebarCollapsed: boolean;
   setSiteDetails: (details: Partial<SiteDetails>) => void;
   initializeDoors: (count: number) => void;
   updateDoor: (id: string, door: Partial<Door>) => void;
   deleteDoor: (id: string) => void;
-  toggleSidebar: () => void; // Add this
+  toggleSidebar: () => void;
   resetForm: () => void;
+  // New Type-Safe Load Action
+  loadAssessment: (data: { siteDetails: SiteDetails; doors: Door[] }) => void;
 }
 
 const initialState = {
@@ -55,14 +56,14 @@ const initialState = {
     siteAddress: '',
     customerPhone: '',
     customerEmail: '',
-    certNumber: generateCertNumber(), // Auto-fills on load
+    certNumber: generateCertNumber(),
     doorCount: 0,
     engineerInitials: '',
     remedialRequired: false,
     engineerSignature: '',
   },
   doors: [],
-  isSidebarCollapsed: false, // Default to visible
+  isSidebarCollapsed: false,
 };
 
 export const useAssessmentStore = create<AssessmentStore>()(
@@ -86,7 +87,6 @@ export const useAssessmentStore = create<AssessmentStore>()(
         set({ doors: newDoors });
       },
 
-      // Logic to flip the sidebar state
       toggleSidebar: () => 
         set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
 
@@ -100,9 +100,21 @@ export const useAssessmentStore = create<AssessmentStore>()(
           doors: state.doors.filter((d) => d.id !== id),
         })),
 
+      // Type-safe Hydration from Supabase
+      loadAssessment: (data) => {
+        set({
+          siteDetails: data.siteDetails,
+          doors: data.doors,
+          isSidebarCollapsed: false, // Ensure layout is correct on load
+        });
+      },
+
       resetForm: () => {
         if (window.confirm("Clear all data and start new audit?")) {
-          set(initialState);
+          set({
+            ...initialState,
+            siteDetails: { ...initialState.siteDetails, certNumber: generateCertNumber() }
+          });
         }
       },
     }),
