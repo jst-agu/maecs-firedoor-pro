@@ -2,149 +2,102 @@
 
 import React from 'react';
 import { useAssessmentStore } from '@/store/useAssessmentStore';
+import { Building2, MapPin, User, Hash, Phone, CheckCircle } from 'lucide-react';
+// Importing your base64 constants
+import { OWNER_SIGNATURE } from '@/constants/assets';
 
-export default function SiteDetails() {
-  const { siteDetails, setSiteDetails, initializeDoors } = useAssessmentStore();
+interface SiteDetailsProps {
+  readOnly?: boolean;
+}
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setSiteDetails({ [name]: value });
-  };
+export default function SiteDetails({ readOnly = false }: SiteDetailsProps) {
+  const { siteDetails, setSiteDetails } = useAssessmentStore();
 
-  const handleToggleRemedial = () => {
-    setSiteDetails({ remedialRequired: !siteDetails.remedialRequired });
+  const handleChange = (field: string, value: string | number | boolean) => {
+    if (readOnly) return;
+    setSiteDetails({ [field]: value });
   };
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
-      <div className="flex justify-between items-center mb-6 border-b pb-4">
-        <h2 className="text-2xl font-black text-slate-800 tracking-tight">
-          SITE <span className="text-red-600">DETAILS</span>
-        </h2>
-        <div className="text-right">
-          <p className="text-[10px] font-bold text-gray-400 uppercase">Date of Inspection</p>
-          <p className="text-sm font-mono font-bold">{new Date().toLocaleDateString('en-GB')}</p>
-        </div>
-      </div>
+    <div className={`bg-white p-8 rounded-3xl border ${readOnly ? 'border-slate-200 bg-slate-50/50' : 'border-slate-200 shadow-sm'}`}>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Business & Client Info */}
-        <div className="flex flex-col gap-1 lg:col-span-2">
-          <label className="text-xs font-bold uppercase text-gray-500">Business Name</label>
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-8 border-b border-slate-100 pb-4">
+        <div className="p-2 bg-red-100 text-red-600 rounded-lg">
+          <Building2 size={20} />
+        </div>
+        <h2 className="text-sm font-black uppercase tracking-widest text-slate-800">
+          Site & Customer <span className="text-red-600">Information</span>
+        </h2>
+      </div>
+
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
+            <Building2 size={12} /> Business / Client Name
+          </label>
           <input
-            name="businessName"
             type="text"
-            className="p-2.5 border border-gray-200 text-gray-600 rounded-lg focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none transition-all"
             value={siteDetails.businessName}
-            onChange={handleChange}
-            placeholder="Client company name"
+            disabled={readOnly}
+            onChange={(e) => handleChange('businessName', e.target.value)}
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-transparent"
+            placeholder="e.g. Metro Property Group"
           />
         </div>
 
-        <div className="flex flex-col gap-1 lg:col-span-2">
-          <label className="text-xs font-bold uppercase text-gray-500">Site Address</label>
+        <div className="space-y-2 md:col-span-2">
+          <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
+            <MapPin size={12} /> Site Address
+          </label>
           <input
-            name="siteAddress"
             type="text"
-            className="p-2.5 border border-gray-200 text-gray-600 rounded-lg focus:ring-2 focus:ring-red-100 focus:border-red-400 outline-none transition-all"
             value={siteDetails.siteAddress}
-            onChange={handleChange}
-            placeholder="Full site location"
+            disabled={readOnly}
+            onChange={(e) => handleChange('siteAddress', e.target.value)}
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-red-500 disabled:bg-transparent"
+            placeholder="Full site location details..."
           />
         </div>
 
-        {/* Contact Info */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-bold uppercase text-gray-500">Customer Name</label>
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
+            <User size={12} /> Site Contact Name
+          </label>
           <input
-            name="customerName"
             type="text"
-            className="p-2.5 border border-gray-200 text-gray-600 rounded-lg outline-none"
             value={siteDetails.customerName}
-            onChange={handleChange}
+            disabled={readOnly}
+            onChange={(e) => handleChange('customerName', e.target.value)}
+            className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-red-500"
           />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-bold uppercase text-gray-500">Customer Phone</label>
-          <input
-            name="customerPhone"
-            type="tel"
-            className="p-2.5 border border-gray-200 text-gray-600 rounded-lg outline-none"
-            value={siteDetails.customerPhone}
-            onChange={handleChange}
-          />
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
+            <Hash size={12} /> Certificate Number
+          </label>
+          <div className="w-full p-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-black text-slate-500 tracking-wider">
+            {siteDetails.certNumber}
+          </div>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-bold uppercase text-gray-500">Customer Email</label>
-          <input
-            name="customerEmail"
-            type="email"
-            className="p-2.5 border border-gray-200 text-gray-600 rounded-lg outline-none"
-            value={siteDetails.customerEmail}
-            onChange={handleChange}
-          />
-        </div>
-
-        {/* Engineer & Certification */}
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-bold uppercase text-gray-500">Engineer Name</label>
-          <input
-            name="engineerInitials"
-            type="text"
-            // maxLength={3}
-            className="p-2.5 border border-gray-200 text-gray-600 rounded-lg outline-none text-center"
-            value={siteDetails.engineerInitials}
-            onChange={handleChange}
-            placeholder="Uchechukwu Okafor..."
-          />
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label className="text-xs font-bold uppercase text-gray-500">Cert Number</label>
-          <input
-            name="certNumber"
-            type="text"
-            className="p-2.5 border border-gray-200 rounded-lg text-gray-600 bg-gray-50 font-mono text-sm"
-            value={siteDetails.certNumber}
-            onChange={handleChange}
-          />
-        </div>
-          {/* <hr /> */}
-        {/* THE CRITICAL INPUTS */}
-        <div className="flex flex-col gap-1 p-4 bg-red-50 rounded-xl border border-red-100 lg:col-span-2">
-          <label className="text-xs font-black uppercase text-red-600 mb-2">Setup Inspection</label>
-          <div className="flex items-center gap-6">
-            <div className="flex-1">
-              <p className="text-[10px] text-red-400 font-bold uppercase mb-1">Total Doors</p>
-              <input
-                name="doorCount"
-                type="number"
-                min="0"
-                className="w-full p-2 border-2 border-red-200 rounded-lg focus:border-red-500 outline-none font-black text-xl text-red-700"
-                value={siteDetails.doorCount}
-                onChange={handleChange}
-                onBlur={() => {
-                   const count = parseInt(siteDetails.doorCount.toString());
-                   if (count > 0) initializeDoors(count);
-                }}
-              />
-            </div>
-            
-            <div className="flex-1">
-              <p className="text-[10px] text-red-400 font-bold uppercase mb-1">Remedial Works?</p>
-              <button
-                onClick={handleToggleRemedial}
-                className={`w-full py-3 rounded-lg font-bold text-xs transition-all border-2 ${
-                  siteDetails.remedialRequired 
-                  ? 'bg-red-600 border-red-600 text-white shadow-lg shadow-red-200' 
-                  : 'bg-white border-red-200 text-red-300'
-                }`}
-              >
-                {siteDetails.remedialRequired ? 'YES - REQUIRED' : 'NO - CLEAR'}
-              </button>
-            </div>
+        {/* --- AUTHENTICATED OWNER SIGNATURE --- */}
+        <div className="space-y-2 lg:pt-0 pt-4">
+          <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest flex items-center gap-2">
+            <CheckCircle size={12} className="text-green-600" /> Authenticated Sign-off
+          </label>
+          <div className="h-[52px] flex items-center justify-between px-4 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-inner relative">
+             <span className="text-[8px] font-black text-slate-300 uppercase italic leading-tight">
+               Verified <br/> Electronic Signature
+             </span>
+             {/* Using your base64 OWNER_SIGNATURE constant */}
+             <img 
+               src={OWNER_SIGNATURE} 
+               alt="Owner Signature" 
+               className="h-12 object-contain mix-blend-multiply"
+             />
           </div>
         </div>
       </div>
